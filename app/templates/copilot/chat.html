@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}المساعد الذكي{% endblock %}
+
+{% block content %}
+<h1>💬 المساعد الذكي</h1>
+
+<section class="card chat-card" id="chat-card" data-stream-url="{{ url_for('copilot.chat_stream') }}">
+  <div class="chat-thread" id="chat-thread">
+    {% if not messages %}
+      <p class="muted center" id="chat-empty">اسأل مساعدك عن مهامك — مثال: «ما أهم 3 مهام يجب أن أبدأ بها اليوم؟»</p>
+    {% endif %}
+    {% for message in messages %}
+      <div class="bubble bubble-{{ message.role }}">
+        <span class="bubble-role">{{ 'أنت' if message.role == 'user' else 'المساعد' }}</span>
+        <p class="bubble-text">{{ message.content }}</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# Progressive enhancement: without JS this POST falls back to the buffered path. #}
+  <form method="post" action="{{ url_for('copilot.chat') }}" class="chat-form" id="chat-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input class="input grow" name="question" id="chat-question" autocomplete="off"
+           placeholder="اكتب سؤالك…" required maxlength="1000">
+    <button class="btn" type="submit" id="chat-send">إرسال</button>
+  </form>
+
+  {% if messages %}
+  <form method="post" action="{{ url_for('copilot.chat_clear') }}" class="chat-clear">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-ghost btn-sm" type="submit">🗑️ تفريغ المحادثة</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/chat.js') }}" defer></script>
+{% endblock %}

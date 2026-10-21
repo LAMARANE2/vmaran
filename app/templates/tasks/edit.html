@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}تعديل المهمة{% endblock %}
+
+{% block content %}
+<div class="card auth-card">
+  <h1>تعديل المهمة</h1>
+  <form method="post" class="form" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="field">
+      <label for="{{ form.title.id }}">{{ form.title.label.text }}</label>
+      {{ form.title(class_="input") }}
+      {% for error in form.title.errors %}<span class="error">{{ error }}</span>{% endfor %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.description.id }}">{{ form.description.label.text }}</label>
+      {{ form.description(class_="input textarea", rows=4) }}
+      {% for error in form.description.errors %}<span class="error">{{ error }}</span>{% endfor %}
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="{{ form.due_date.id }}">{{ form.due_date.label.text }}</label>
+        {{ form.due_date(class_="input") }}
+      </div>
+      <div class="field">
+        <label for="{{ form.priority.id }}">{{ form.priority.label.text }}</label>
+        {{ form.priority(class_="input") }}
+      </div>
+    </div>
+
+    {{ form.submit(class_="btn") }}
+    <a class="link" href="{{ url_for('tasks.board') }}">العودة للوحة</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}الخطة الأسبوعية{% endblock %}
+
+{% block content %}
+<h1>🗓️ الخطة الأسبوعية</h1>
+
+{% if error %}
+<section class="card"><p class="flash flash-error">{{ error }}</p></section>
+{% elif entries %}
+<section class="card">
+  <p class="muted small">راجع التواريخ المقترحة ثم اضغط «تطبيق الخطة» لحفظها.</p>
+  <form method="post" action="{{ url_for('copilot.plan_apply') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <table class="table">
+      <thead>
+        <tr><th>المهمة</th><th>الأولوية</th><th>التاريخ المقترح</th></tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td>
+            {{ entry.task.title }}
+            <input type="hidden" name="task_id" value="{{ entry.task.id }}">
+          </td>
+          <td><span class="badge badge-{{ entry.task.priority }}">{{ {'low': 'منخفضة', 'medium': 'متوسطة', 'high': 'عالية', 'urgent': 'عاجلة'}[entry.task.priority] }}</span></td>
+          <td><input class="input input-sm" type="date" name="due_date" value="{{ entry.when.isoformat() }}"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="form-inline">
+      <button class="btn" type="submit">تطبيق الخطة</button>
+      <a class="link" href="{{ url_for('tasks.board') }}">العودة للوحة</a>
+    </div>
+  </form>
+</section>
+{% else %}
+<section class="card"><p class="muted">لا توجد مهام مفتوحة للتخطيط.</p></section>
+{% endif %}
+{% endblock %}

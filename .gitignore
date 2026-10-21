@@ -1,0 +1,8 @@
+.env
+venv/
+instance/
+logs/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/

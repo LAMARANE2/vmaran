@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}خطأ في الخادم{% endblock %}
+
+{% block content %}
+<div class="card auth-card center">
+  <h1>500</h1>
+  <p class="muted">حدث خطأ غير متوقع. تم تسجيله وسنعمل على إصلاحه.</p>
+  <a class="btn" href="{{ url_for('tasks.board') }}">العودة إلى اللوحة</a>
+</div>
+{% endblock %}

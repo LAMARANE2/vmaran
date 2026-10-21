@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}لوحة المهام{% endblock %}
+
+{% macro badge(priority) -%}
+  <span class="badge badge-{{ priority }}">{{ {'low': 'منخفضة', 'medium': 'متوسطة', 'high': 'عالية', 'urgent': 'عاجلة'}[priority] }}</span>
+{%- endmacro %}
+
+{% block content %}
+<h1>لوحة المهام</h1>
+
+<section class="card nl-card">
+  <h2>✨ إنشاء ذكي من نص حر</h2>
+  <p class="muted small">اكتب مهامك كما تنطقها — مثال: «غداً راجع التقرير وأرسله لأحمد بأولوية عالية، وجدّد الهوية البصرية الأسبوع القادم»</p>
+  <textarea id="nl-text" class="input textarea" rows="3" placeholder="اكتب هنا…"></textarea>
+  <div class="form-inline">
+    <button type="button" class="btn" id="nl-analyze">تحليل بالذكاء الاصطناعي</button>
+    <span id="nl-status" class="muted small"></span>
+  </div>
+  <div id="nl-preview" hidden>
+    <h3>معاينة المهام</h3>
+    <ul id="nl-list" class="nl-list"></ul>
+    <div class="form-inline">
+      <button type="button" class="btn" id="nl-apply">تطبيق وإنشاء</button>
+      <button type="button" class="btn btn-ghost" id="nl-cancel">إلغاء</button>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>مهمة جديدة</h2>
+  <form method="post" action="{{ url_for('tasks.create') }}" class="form-inline">
+    {{ form.hidden_tag() }}
+    {{ form.title(class_="input grow", placeholder="مثال: مراجعة التقرير قبل الخميس") }}
+    {{ form.priority(class_="input") }}
+    {{ form.due_date(class_="input") }}
+    {{ form.submit(class_="btn") }}
+  </form>
+  {% for error in form.title.errors %}<span class="error">{{ error }}</span>{% endfor %}
+  <div class="form-inline tools-row">
+    <form method="post" action="{{ url_for('copilot.reschedule') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-ghost btn-sm" type="submit">🔄 إعادة جدولة المتأخرة</button>
+    </form>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('copilot.digest') }}">📰 الملخص اليومي</a>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('copilot.plan') }}">🗓️ الخطة الأسبوعية</a>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('copilot.chat') }}">💬 المساعد</a>
+  </div>
+</section>
+
+<div class="board">
+  {% for status in ['todo', 'doing', 'done'] %}
+  <section class="column">
+    <h2 class="column-title">{{ status_labels[status] }} <span class="count">{{ grouped[status]|length }}</span></h2>
+
+    {% for task in grouped[status] %}
+    <article class="task">
+      <div class="task-head">
+        <strong>{{ task.title }}</strong>
+        {{ badge(task.priority) }}
+      </div>
+      {% if task.description %}<p class="task-desc">{{ task.description }}</p>{% endif %}
+      <p class="task-meta">
+        {% if task.due_date %}<span class="muted small">📅 {{ task.due_date.strftime('%Y-%m-%d') }}</span>{% endif %}
+        {% if task.estimated_hours %}<span class="muted small">⏱ {{ task.estimated_hours }} ساعة</span>{% endif %}
+      </p>
+      {% if task.tags %}
+      <div class="tags">
+        {% for tag in task.tags %}<span class="tag">#{{ tag.name }}</span>{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="task-actions">
+        <form method="post" action="{{ url_for('tasks.set_status', task_id=task.id) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <select name="status" class="input input-sm">
+            {% for s in ['todo', 'doing', 'done'] %}
+            <option value="{{ s }}" {% if task.status == s %}selected{% endif %}>{{ status_labels[s] }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-sm" type="submit">نقل</button>
+        </form>
+        <a class="link" href="{{ url_for('tasks.edit', task_id=task.id) }}">تعديل</a>
+        <form method="post" action="{{ url_for('tasks.delete', task_id=task.id) }}" class="inline-form"
+              onsubmit="return confirm('هل تريد حذف هذه المهمة؟')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-danger btn-sm" type="submit">حذف</button>
+        </form>
+      </div>
+    </article>
+    {% else %}
+    <p class="muted empty">لا توجد مهام هنا</p>
+    {% endfor %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

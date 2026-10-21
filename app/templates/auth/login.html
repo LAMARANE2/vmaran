@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}تسجيل الدخول{% endblock %}
+
+{% block content %}
+<div class="card auth-card">
+  <h1>تسجيل الدخول</h1>
+  <form method="post" class="form" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="field">
+      <label for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+      {{ form.email(class_="input", autocomplete="email", placeholder="you@example.com") }}
+      {% for error in form.email.errors %}<span class="error">{{ error }}</span>{% endfor %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.password.id }}">{{ form.password.label.text }}</label>
+      {{ form.password(class_="input", autocomplete="current-password") }}
+      {% for error in form.password.errors %}<span class="error">{{ error }}</span>{% endfor %}
+    </div>
+
+    {{ form.submit(class_="btn") }}
+  </form>
+  <p class="muted">لا تملك حساباً؟ <a href="{{ url_for('auth.register') }}">أنشئ حساباً جديداً</a></p>
+</div>
+{% endblock %}

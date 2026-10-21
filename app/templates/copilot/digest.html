@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}الملخص اليومي{% endblock %}
+
+{% block content %}
+<h1>📰 الملخص اليومي — {{ today.strftime('%Y-%m-%d') }}</h1>
+
+<section class="card stats">
+  <div class="stat"><span class="stat-num">{{ stats.total }}</span><span class="muted small">الكل</span></div>
+  <div class="stat"><span class="stat-num">{{ stats.todo }}</span><span class="muted small">قيد الانتظار</span></div>
+  <div class="stat"><span class="stat-num">{{ stats.doing }}</span><span class="muted small">قيد التنفيذ</span></div>
+  <div class="stat"><span class="stat-num">{{ stats.done }}</span><span class="muted small">منجزة</span></div>
+  <div class="stat"><span class="stat-num stat-danger">{{ stats.overdue }}</span><span class="muted small">متأخرة</span></div>
+</section>
+
+<section class="card">
+  <h2>ملخص الذكاء الاصطناعي</h2>
+  {% if summary %}
+    <p class="digest-text">{{ summary }}</p>
+  {% elif error %}
+    <p class="flash flash-error">{{ error }}</p>
+  {% else %}
+    <p class="muted">لا توجد مهام لتلخيصها بعد.</p>
+  {% endif %}
+</section>
+{% endblock %}

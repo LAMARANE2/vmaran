@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}صفحة غير موجودة{% endblock %}
+
+{% block content %}
+<div class="card auth-card center">
+  <h1>404</h1>
+  <p class="muted">الصفحة التي تبحث عنها غير موجودة.</p>
+  <a class="btn" href="{{ url_for('tasks.board') }}">العودة إلى اللوحة</a>
+</div>
+{% endblock %}
